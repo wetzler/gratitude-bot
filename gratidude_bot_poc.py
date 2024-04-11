@@ -6,7 +6,7 @@ completion = client.chat.completions.create(
   model="gpt-4-1106-preview",
   # messages=[
   #   {"role": "system", "content": "You are a conversational assistant that helps people express and share gratitude. You are friendly, calm, and supportive."},
-  #   {"role": "user", "content": "Someone has recently logged the following in their gratitude journal. Summarize the entries for them in under 160 characters. Look for themes or people of interest. Make a recommendation based on the entries. ou are trying to encourage a daily practice of gratitude. \
+  #   {"role": "user", "content": "Someone has recently logged the following in their gratitude journal. Summarize the entries for them in under 160 characters. Look for themes or people of interest. Make a recommendation based on the entries. You are trying to encourage a daily practice of gratitude. \
   #   01/01/2024: Danielle.\
   #   01/02/2024: my health.\
   #   01/03/2024: my husband.\
