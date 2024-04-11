@@ -5,6 +5,6 @@ Peaceful friend who inspires gratitude via text message
 - Text XXX-XXX-XXXX to subscribe
 - Text STOP to unsubscribe anytime
 - Respond to bot's daily gratitude prompt
-- Increase your well-being by appreciating life more
+- Improve your vibe by appreciating your life more
 
 
