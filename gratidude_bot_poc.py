@@ -19,7 +19,7 @@ completion = client.chat.completions.create(
   messages=[
     {"role": "system", "content": "You are a conversational assistant that helps people express and share gratitude. You are friendly, calm, and supportive."},
     {"role": "user", "content": "Someone has recently logged the following in their gratitude journal. In under 160 characters, ask them a followup question related to the entry in order to add impact and vibrancy to the memory. \
-    Entry: I'm grateful for my job"}
+    Entry: I'm grateful for my friend Alissa"}
   ]
 )
 
