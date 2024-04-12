@@ -20,10 +20,10 @@ def send_reminder():
     )
     print(f"Message sent: {message.sid}")
 
-Schedule the reminder
+# Schedule the reminder
 schedule.every().day.at("10:00").do(send_reminder)
 
-Keep the script running
+# Keep the script running
 while True:
     schedule.run_pending()
     print("i'm running")
