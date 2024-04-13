@@ -16,9 +16,6 @@ def sms():
     number = request.form['From']
     message_body = request.form['Body']
 
-    # Insert a row of data
-    airtable.insert({'Number': number, 'Message': message_body})
-
     # Define the URL
     url = f"https://api.airtable.com/v0/{base_key}/{table_name}"
 
@@ -43,4 +40,4 @@ def sms():
     return '', 200
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=8000)

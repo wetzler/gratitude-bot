@@ -20,6 +20,7 @@ def send_reminder():
     )
     print(f"Message sent: {message.sid}")
 
+send_reminder()
 # Schedule the reminder
 schedule.every().day.at("10:00").do(send_reminder)
 
