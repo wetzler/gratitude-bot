@@ -7,7 +7,7 @@ base_key = os.getenv('AIRTABLE_BASE_KEY')
 table_name = os.getenv('AIRTABLE_TABLE_NAME')
 access_token = os.getenv('AIRTABLE_PERSONAL_ACCESS_TOKEN')
 
-def store_message(from_number, to_number, message_body, message_type):
+def store_message(from_number, to_number, message_body, message_type, twilio_message_sid):
    
     # Define the URL to send the message details to
     url = f"https://api.airtable.com/v0/{base_key}/{table_name}"
@@ -23,7 +23,8 @@ def store_message(from_number, to_number, message_body, message_type):
             "from_number": from_number,
             "to_number": to_number,
             "message_body": message_body,
-            "message_type": message_type
+            "message_type": message_type,
+            "twilio_message_sid": twilio_message_sid
         }
     }
     # Make the post request 

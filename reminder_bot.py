@@ -4,10 +4,11 @@ import schedule
 import time
 import datetime
 import storage 
-from dotenv import load_dotenv
 
-project_folder = os.path.expanduser('~/.')  # adjust as appropriate
-load_dotenv(os.path.join(project_folder, '.env'))
+# this stuff needs to be there for this to run on PythonAnywhere
+# from dotenv import load_dotenv
+# project_folder = os.path.expanduser('~/.')  # adjust as appropriate
+# load_dotenv(os.path.join(project_folder, '.env'))
 
 # Twilio credentials
 account_sid = os.environ.get('TWILIO_ACCOUNT_SID')
@@ -26,10 +27,12 @@ def send_reminder():
         to=user_number
     )
     print(f"Message sent: {message.sid}")
-    storage.store_message(twilio_number, user_number, text_reminder, message_type='scheduled_prompt')
+    storage.store_message(twilio_number, user_number, text_reminder,"scheduled_prompt",message.sid)
+
+send_reminder()
 
 # Schedule the reminder
-schedule.every(5).minutes.do(send_reminder)
+schedule.every(24).hours.do(send_reminder)
 
 # Keep the script running
 while True:

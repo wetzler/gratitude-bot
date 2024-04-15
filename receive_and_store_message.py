@@ -16,17 +16,21 @@ app = Flask(__name__)
 
 @app.route('/sms', methods=['POST'])
 def sms():
+    print(request)
     # Get the text message details
     from_number = request.form['From']
     to_number = request.form['To']
     message_body = request.form['Body']
+    twilio_message_sid  = request.form['MessageSid']
 
     # store the message
-    storage.store_message(from_number, to_number, message_body, message_type='incoming')
+    storage.store_message(from_number, to_number, message_body,"incoming user response",twilio_message_sid)
 
     # Check if it's a response to our initial question or a followup question
     # Is the most recent message in the conversation our daily prompt? If so, send a followup question.
-    # If we haven't received a message from that number in the last 12hr, we assume it's an answer to our daily prompt.
+
+    # get messages from and to this user in the last 24hr, excluding the one with this message id. 
+
     # Check airtable for a message from that number in the last 24hr.
     # Get the time 12 hours ago
     time_12_hours_ago = (datetime.now() - timedelta(hours=12)).isoformat()
