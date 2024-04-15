@@ -4,6 +4,10 @@ import schedule
 import time
 import datetime
 import storage 
+from dotenv import load_dotenv
+
+project_folder = os.path.expanduser('~/.')  # adjust as appropriate
+load_dotenv(os.path.join(project_folder, '.env'))
 
 # Twilio credentials
 account_sid = os.environ.get('TWILIO_ACCOUNT_SID')
