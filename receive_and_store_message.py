@@ -2,8 +2,6 @@ import os
 import requests
 import urllib.parse
 from flask import Flask, request
-from openai import OpenAI
-from datetime import datetime, timedelta
 import storage
 import generative_ai
 import send_response
