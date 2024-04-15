@@ -33,7 +33,7 @@ def store_message(from_number, to_number, message_body, message_type, twilio_mes
 
 def store_user(user_number, first_message):
     # Define the URL to send the user details to
-    url = f"https://api.airtable.com/v0/{base_key}/{users}"
+    url = f"https://api.airtable.com/v0/{base_key}/{"users"}"
 
     # Define the headers and data for the request 
     headers = {
