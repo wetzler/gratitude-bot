@@ -1,11 +1,14 @@
 import os
 import json
+import datetime
 import requests
 import urllib.parse
 from flask import Flask, request
 from openai import OpenAI
 from datetime import datetime, timedelta
 import storage
+import generative_ai
+import send_response
 
 # Get Airtable parameters from environment variables
 base_key = os.getenv('AIRTABLE_BASE_KEY')
@@ -16,32 +19,25 @@ app = Flask(__name__)
 
 @app.route('/sms', methods=['POST'])
 def sms():
-    print(request)
     # Get the text message details
     from_number = request.form['From']
     to_number = request.form['To']
     message_body = request.form['Body']
     twilio_message_sid  = request.form['MessageSid']
+    print("New message from "+ from_number + ": "+ message_body)
 
-    # store the message
-    storage.store_message(from_number, to_number, message_body,"incoming user response",twilio_message_sid)
+    # Log the message
+    storage.store_message(from_number, to_number, message_body,"incoming user message",twilio_message_sid)
 
-    # Check if it's a response to our initial question or a followup question
-    # Is the most recent message in the conversation our daily prompt? If so, send a followup question.
-
-    # get messages from and to this user in the last 24hr, excluding the one with this message id. 
-
-    # Check airtable for a message from that number in the last 24hr.
-    # Get the time 12 hours ago
-    time_12_hours_ago = (datetime.now() - timedelta(hours=12)).isoformat()
-
-    # Define the filter formula
-    filter_formula = "AND({{from_number}} = '{}', {{created_time}} > '{}')".format(number, time_12_hours_ago)
+    # Get some information about this conversation so we can figure out what to do next 
+    # Define the filter formula to find messages to or from this number 
+    filter_formula = f"(OR(from_number='{from_number}', to_number='{from_number}'))"   
+    # to-do: only get the messages from the last 24 hours instead of all of them
 
     # URL-encode the filter formula
     filter_formula = urllib.parse.quote(filter_formula)
 
-    # Define the URL to send the message details to
+    # Define the URL to make the request to the database
     url = f"https://api.airtable.com/v0/{base_key}/{table_name}?filterByFormula={filter_formula}"
 
     # Define the headers for the request 
@@ -49,38 +45,29 @@ def sms():
         "Authorization": f"Bearer {access_token}"
     }
 
-    # Make the GET request
+    # Make the GET request for the conversation data 
     recentmessages = requests.get(url, headers=headers)
-
     # Parse the JSON response
     data = recentmessages.json()
     records = data.get('records', [])
+    print("Found "+str(len(records))+" records in this conversation.")
 
-    # in case the latest message has already been written, remove it from the records
-    # delete any record whose UserResponse is the same as the message_body
-    records = [obj for obj in records if obj['fields']['message_body'] != message_body]
+    # Sort the records by created time so the most recent is first
+    records.sort(key=lambda x: x['fields']['created_time'], reverse=True)
+    # Exclude the current incoming message from our list of previous messages
+    records = [record for record in records if 'twilio_message_sid' in record['fields'] and record['fields']['twilio_message_sid'] != twilio_message_sid]
+    # Get the most recent message prior to this one so we can figure out what to do next
+    previous_message = records[0]['fields']['message_body']
+    print("The previous message was: "+previous_message)
 
-    # If we have a record, it's a followup question
-    # If the length of records is greater than 0, we have a record
-    if len(records) == 0:
-        print ("the records length was 0")
-        print ("we'll ask for more detail now")
-        from openai import OpenAI
-        client = OpenAI()
-        completion = client.chat.completions.create( 
-        model="gpt-4-1106-preview",
-        messages=[
-            {"role": "system", "content": "You are a conversational assistant that helps people express and share gratitude. You are friendly, calm, and supportive."},
-            {"role": "user", "content": "Someone has recently logged the following in their gratitude journal. In under 160 characters, ask them a followup question related to the entry in order to add impact and vibrancy to the memory. \
-            Entry: I'm grateful for my friend Alissa"}
-        ]
-        )
-        print(completion.choices[0].message)
-    else:    
-        print ("the records length was > 0")
-        print (len(records))
-        print ("we already got enough responses today!")
-    return '', 200
+    # check if the previous message contains "gratitude bot". If so, assume this text is a response to our daily prompt and ask a followup question
+    if "gratitude bot" in previous_message:
+        #ask AI to genereate a followup question
+        followup_question = generative_ai.generate_response(message_body)
+        print("Our followup question: "+followup_question.content)  
+        user_number=from_number
+        send_response.send_message(followup_question.content,user_number,"followup_question")  
+    return "Message received"
 
 if __name__ == '__main__':
     app.run(debug=True, port=8000)

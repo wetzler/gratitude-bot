@@ -30,6 +30,4 @@ def store_message(from_number, to_number, message_body, message_type, twilio_mes
     # Make the post request 
     response = requests.post(url, headers=headers, data=json.dumps(data))
 
-    # Print the response
-    print(response.json())
     return response.json()
