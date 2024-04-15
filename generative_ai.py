@@ -1,6 +1,11 @@
 from openai import OpenAI
 client = OpenAI()
 
+# this stuff needs to be there for this to run on PythonAnywhere
+from dotenv import load_dotenv
+project_folder = os.path.expanduser('~/.')  # adjust as appropriate
+load_dotenv(os.path.join(project_folder, '.env'))
+
 def generate_response(gratitude_submission):
   completion = client.chat.completions.create(
     model="gpt-4-1106-preview",

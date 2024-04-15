@@ -2,6 +2,11 @@ import os
 import json
 import requests
 
+# this stuff needs to be there for this to run on PythonAnywhere
+from dotenv import load_dotenv
+project_folder = os.path.expanduser('~/.')  # adjust as appropriate
+load_dotenv(os.path.join(project_folder, '.env'))
+
 # Get Airtable parameters from environment variables
 base_key = os.getenv('AIRTABLE_BASE_KEY')
 table_name = os.getenv('AIRTABLE_TABLE_NAME')
