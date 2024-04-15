@@ -6,6 +6,11 @@ import storage
 import generative_ai
 import send_response
 
+# this stuff needs to be there for this to run on PythonAnywhere
+# from dotenv import load_dotenv
+# project_folder = os.path.expanduser('~/.')  # adjust as appropriate
+# load_dotenv(os.path.join(project_folder, '.env'))
+
 # Get Airtable parameters from environment variables
 base_key = os.getenv('AIRTABLE_BASE_KEY')
 table_name = os.getenv('AIRTABLE_TABLE_NAME')
@@ -76,4 +81,5 @@ def sms():
     return "Message received"
 
 if __name__ == '__main__':
-    app.run(debug=True, port=8000)
+    # app.run(debug=True, port=8000)  # use this for local development
+    app.run()  # use this for PythonAnywhere
