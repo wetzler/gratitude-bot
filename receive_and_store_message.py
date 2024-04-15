@@ -1,6 +1,4 @@
 import os
-import json
-import datetime
 import requests
 import urllib.parse
 from flask import Flask, request
