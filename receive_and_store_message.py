@@ -58,19 +58,23 @@ def sms():
     previous_message = records[0]['fields']['message_body']
     print("The previous message was: " + previous_message)
 
+    user_number = from_number
     # check if it's a new subscriber
     if len(records) == 0:
         # send a welcome message
         welcome_message = "Hi! I'll send you a daily reminder to appreciate stuff. Say STOP anytime. What are you grateful for today? 🌟"
-        user_number = from_number
         send_response.send_message(welcome_message, user_number, "welcome_message")
+        storage.store_user(user_number, message_body)
     # check if the previous message contains "gratitude bot". If so, assume this text is a response to prompts and ask a followup question
     elif "gratitude bot" in previous_message or "daily reminder" in previous_message:
         # ask AI to generate a followup question
         followup_question = generative_ai.generate_response(message_body)
         print("Our followup question: " + followup_question.content)
-        user_number = from_number
         send_response.send_message(followup_question.content, user_number, "followup_question")
+    else:
+        #send a thank you message
+        thank_you_message = "Yay! Thanks for sharing. Keep it up! 🌟"
+        send_response.send_message(thank_you_message, user_number, "thanks_for_submitting")
     return "Message received"
 
 if __name__ == '__main__':
