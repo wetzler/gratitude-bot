@@ -70,7 +70,7 @@ def sms():
     # check if it's a new subscriber
     if len(records) == 0:
         # send a welcome message
-        welcome_message = "Hi! I'll send you a daily reminder to appreciate stuff. Say STOP anytime. What are you grateful for today? 🌟"
+        welcome_message = "hi! i'll send you a daily reminder to appreciate stuff. say STOP anytime. what are you grateful for today? 🌟"
         send_response.send_message(welcome_message, user_number, "welcome_message")
         storage.store_user(user_number, message_body)
     # check if the previous message contains "gratitude bot". If so, assume this text is a response to prompts and ask a followup question
