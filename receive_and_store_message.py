@@ -81,7 +81,7 @@ def sms():
         send_response.send_message(followup_question.content, user_number, "followup_question")
     else:
         #send a thank you message
-        thank_you_message = "Yay! Thanks for sharing. Keep it up! 🌟"
+        thank_you_message = "thanks for sharing. keep it up! 🌟"
         send_response.send_message(thank_you_message, user_number, "thanks_for_submitting")
     return "Message received"
 
