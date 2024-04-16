@@ -26,7 +26,6 @@ def sms():
     message_body = request.form['Body']
     twilio_message_sid  = request.form['MessageSid']
     print("New message from "+ from_number + ": "+ message_body)
-
     # Log the message
     storage.store_message(from_number, to_number, message_body,"incoming user message",twilio_message_sid)
 
