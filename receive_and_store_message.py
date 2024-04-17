@@ -53,7 +53,6 @@ def sms():
 
     # Make the GET request for the conversation data
     recentmessages = requests.get(url, headers=headers)
-    # Parse the JSON response
     data = recentmessages.json()
     records = data.get('records', [])
     print("Found "+str(len(records))+" records in this conversation.")
@@ -68,23 +67,32 @@ def sms():
 
     user_number = from_number
     # check if it's a new subscriber
-    if len(records) == 0:
+    if message_body in ["START", "start", "Start", "Restart", "restart", "RESTART"]:
         # send a welcome message
-        welcome_message = "hi! i'll send you a daily reminder to appreciate stuff. say STOP anytime. what are you grateful for today? 🌟"
-        send_response.send_message(welcome_message, user_number, "welcome_message")
+        welcome_message = "hi! my name is gratitude bot! i send daily gratitude prompts. you can reply STOP at anytime. what are you grateful for today? 🌟"
+        send_response.send_message(welcome_message, user_number, "new_user_subscribed_welcome_message")
         storage.store_user(user_number, message_body)
+    elif not records:
+        # send a welcome message
+        welcome_message = "hi! ny name is gratitude bot! i send daily gratitude prompts. reply START to subscribe. you can reply STOP at anytime. what are you grateful for today? 🌟"
+        send_response.send_message(welcome_message, user_number, "new_user_start_to_subscribe_welcome_message")
+        storage.store_user(user_number, message_body)
+    elif message_body in ["STOP", "stop", "Stop"]:
+        goodbye_message = "i'll stop sending messages now! send START to subscribe again. have a great day! 🌟"
+        send_response.send_message(goodbye_message, user_number, "unsubscribe_message")
+        storage.remove_user(user_number)
     # check if the previous message contains "gratitude bot". If so, assume this text is a response to prompts and ask a followup question
     elif "gratitude bot" in previous_message or "daily reminder" in previous_message:
         # ask AI to generate a followup question
         followup_question = generative_ai.generate_response(message_body)
         print("Our followup question: " + followup_question.content)
         send_response.send_message(followup_question.content, user_number, "followup_question")
-    else:
-        #send a thank you message
-        thank_you_message = "thanks for sharing. keep it up! 🌟"
-        send_response.send_message(thank_you_message, user_number, "thanks_for_submitting")
+    # else:
+    #     #send a thank you message
+    #     thank_you_message = "thanks for sharing. keep it up! 🌟"
+    #     send_response.send_message(thank_you_message, user_number, "thanks_for_submitting")
     return "Message received"
 
 if __name__ == '__main__':
-    # app.run(debug=True, port=8000)  # use this for local development
-    app.run()  # use this for PythonAnywhere
+    app.run(debug=True, port=8000)  # use this for local development
+    # app.run()  # use this for PythonAnywhere

@@ -1,90 +1,25 @@
 import os
-import requests
-import urllib.parse
-from flask import Flask, request
+from twilio.rest import Client
 import storage
-import generative_ai
-import send_response
 
 # this stuff needs to be there for this to run on PythonAnywhere
 from dotenv import load_dotenv
 project_folder = os.path.expanduser('~/.')  # adjust as appropriate
 load_dotenv(os.path.join(project_folder, '.env'))
 
-# Get Airtable parameters from environment variables
-base_key = os.environ.get('AIRTABLE_BASE_KEY')
-table_name = os.environ.get('AIRTABLE_TABLE_NAME')
-access_token = os.environ.get('AIRTABLE_PERSONAL_ACCESS_TOKEN')
+# Twilio credentials
+account_sid = os.environ.get('TWILIO_ACCOUNT_SID')
+auth_token = os.environ.get('TWILIO_AUTH_TOKEN')
+twilio_number = os.environ.get('TWILIO_PHONE_NUMBER')
 
-app = Flask(__name__)
+# Initialize Twilio client
+client = Client(account_sid, auth_token)
 
-@app.route('/')
-def home():
-    return "Hello, World!"
-
-@app.route('/sms', methods=['POST'])
-def sms():
-    print(table_name)
-    # Get the text message details
-    from_number = request.form['From']
-    to_number = request.form['To']
-    message_body = request.form['Body']
-    twilio_message_sid  = request.form['MessageSid']
-    print("New message from "+ from_number + ": "+ message_body)
-
-    # Log the message
-    response = storage.store_message(from_number, to_number, message_body,"incoming user message",twilio_message_sid)
-    print(response)
-    # Get some information about this conversation so we can figure out what to do next
-    # Define the filter formula to find messages to or from this number
-    filter_formula = f"(OR(from_number='{from_number}', to_number='{from_number}'))"
-    # to-do: only get the messages from the last 24 hours instead of all of them
-
-    # URL-encode the filter formula
-    filter_formula = urllib.parse.quote(filter_formula)
-
-    # Define the URL to make the request to the database
-    url = f"https://api.airtable.com/v0/{base_key}/{table_name}?filterByFormula={filter_formula}"
-
-    # Define the headers for the request
-    headers = {
-        "Authorization": f"Bearer {access_token}"
-    }
-
-    # Make the GET request for the conversation data
-    recentmessages = requests.get(url, headers=headers)
-    # Parse the JSON response
-    data = recentmessages.json()
-    records = data.get('records', [])
-    print("Found "+str(len(records))+" records in this conversation.")
-
-    # Sort the records by created time so the most recent is first
-    records.sort(key=lambda x: x['fields']['created_time'], reverse=True)
-    # Exclude the current incoming message from our list of previous messages
-    records = [record for record in records if 'twilio_message_sid' in record['fields'] and record['fields']['twilio_message_sid'] != twilio_message_sid]
-    # Get the most recent message prior to this one so we can figure out what to do next
-    previous_message = records[0]['fields']['message_body']
-    print("The previous message was: " + previous_message)
-
-    user_number = from_number
-    # check if it's a new subscriber
-    if len(records) == 0:
-        # send a welcome message
-        welcome_message = "Hi! I'll send you a daily reminder to appreciate stuff. Say STOP anytime. What are you grateful for today? 🌟"
-        send_response.send_message(welcome_message, user_number, "welcome_message")
-        storage.store_user(user_number, message_body)
-    # check if the previous message contains "gratitude bot". If so, assume this text is a response to prompts and ask a followup question
-    elif "gratitude bot" in previous_message or "daily reminder" in previous_message:
-        # ask AI to generate a followup question
-        followup_question = generative_ai.generate_response(message_body)
-        print("Our followup question: " + followup_question.content)
-        send_response.send_message(followup_question.content, user_number, "followup_question")
-    else:
-        #send a thank you message
-        thank_you_message = "Yay! Thanks for sharing. Keep it up! 🌟"
-        send_response.send_message(thank_you_message, user_number, "thanks_for_submitting")
-    return "Message received"
-
-if __name__ == '__main__':
-    # app.run(debug=True, port=8000)  # use this for local development
-    app.run()  # use this for PythonAnywhere
+def send_message(message_body,to_number,message_type):
+    message = client.messages.create(
+        body=message_body,
+        from_=twilio_number,
+        to=to_number
+    )
+    print(f"Message sent: {message.sid}")
+    storage.store_message(twilio_number, to_number, message_body,message_type,message.sid)
