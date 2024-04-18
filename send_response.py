@@ -21,5 +21,6 @@ def send_message(message_body,to_number,message_type):
         from_=twilio_number,
         to=to_number
     )
-    print(f"Message sent: {message.sid}")
+    print(f"Message sent to twilio: {message.sid}")
+    print(f"Message status: {message.status}")
     storage.store_message(twilio_number, to_number, message_body,message_type,message.sid)

@@ -1,6 +1,7 @@
 import os
 import json
 import requests
+import urllib.parse
 
 # this stuff needs to be there for this to run on PythonAnywhere
 from dotenv import load_dotenv
