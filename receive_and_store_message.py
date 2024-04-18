@@ -62,8 +62,11 @@ def sms():
     # Exclude the current incoming message from our list of previous messages
     records = [record for record in records if 'twilio_message_sid' in record['fields'] and record['fields']['twilio_message_sid'] != twilio_message_sid]
     # Get the most recent message prior to this one so we can figure out what to do next
-    previous_message = records[0]['fields']['message_body']
-    print("The previous message was: " + previous_message)
+    previous_message = records[0]['fields']['message_body'] if records else None
+    if previous_message == None:
+        print("No previous message found.")
+    else:
+        print("The previous message was: " + previous_message)
 
     user_number = from_number
     # check if it's a new subscriber
@@ -74,7 +77,7 @@ def sms():
         storage.store_user(user_number, message_body)
     elif not records:
         # send a welcome message
-        welcome_message = "hi! ny name is gratitude bot! i send daily gratitude prompts. reply START to subscribe. you can reply STOP at anytime. what are you grateful for today? 🌟"
+        welcome_message = "hi! my name is gratitude bot! i send daily gratitude prompts. reply START to subscribe. you can reply STOP at anytime. what are you grateful for today? 🌟"
         send_response.send_message(welcome_message, user_number, "new_user_start_to_subscribe_welcome_message")
         storage.store_user(user_number, message_body)
     elif message_body in ["STOP", "stop", "Stop"]:
