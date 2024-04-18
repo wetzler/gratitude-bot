@@ -4,6 +4,7 @@ import schedule
 import time
 import datetime
 import storage
+import requests
 
 # this stuff needs to be there for this to run on PythonAnywhere
 from dotenv import load_dotenv
@@ -15,6 +16,12 @@ account_sid = os.environ.get('TWILIO_ACCOUNT_SID')
 auth_token = os.environ.get('TWILIO_AUTH_TOKEN')
 twilio_number = os.environ.get('TWILIO_PHONE_NUMBER')
 
+# Airtable credentials
+base_key = os.environ.get('AIRTABLE_BASE_KEY')
+table_name = os.environ.get('AIRTABLE_TABLE_NAME')
+access_token = os.environ.get('AIRTABLE_PERSONAL_ACCESS_TOKEN')
+
+print(base_key)
 # Get list of numbers that need reminders
 url = f"https://api.airtable.com/v0/{base_key}/Users"  # Define the URL to make the request to the database
 
@@ -26,11 +33,12 @@ headers = {   # Define the headers for the request
 response = requests.get(url, headers=headers)
 data = response.json()
 users = data.get('records', [])
-print("Found "+str(len(records))+" users.")
 
 # Get all user_number values
-user_numbers = [record['fields']['user_number'] for record in records]
- 
+user_numbers = set(user['fields']['user_number'] for user in users)
+print("Found "+str(len(user_numbers))+" users.")
+print(user_numbers)
+
 # Initialize Twilio client
 client = Client(account_sid, auth_token)
 
