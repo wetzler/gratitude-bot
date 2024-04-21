@@ -9,7 +9,7 @@ Peaceful friend who inspires gratitude via text message. Enhance your vibe by ap
 
 # Disclaimers 
 - Gratitude bot is currently in development and is likely to have outages, changes, bugs, data loss, and generally be unrealible until further notice.
-- Gratitude bot can currenly only capture responses written in text format. Photos and videos will be ignored.
+- Gratitude bot can currently only capture responses written in text format. Photos and videos will be ignored.
 - Privacy: while gratitude bot is in private beta, administrators of gratitude bot are likely to see and review your submissions. Your submissions will never be shared with anyone else without your explicit permission.
 
 
