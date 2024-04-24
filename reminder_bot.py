@@ -6,10 +6,9 @@ import datetime
 import storage
 import requests
 
-# this stuff needs to be there for this to run on PythonAnywhere
+# load env variables 
 from dotenv import load_dotenv
-project_folder = os.path.expanduser('~/.')
-load_dotenv(os.path.join(project_folder, '.env'))
+load_dotenv(override=True)
 
 # Twilio credentials
 account_sid = os.environ.get('TWILIO_ACCOUNT_SID')
