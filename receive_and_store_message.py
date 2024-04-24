@@ -72,7 +72,7 @@ def sms():
             conversation_from_number = "gratitude bot"
         elif conversation_from_number == from_number:
             conversation_from_number = "subscriber"
-        message_body = record['fields']['message_body']
+        message_body = record['fields'].get('message_body', 'no message (might have been a photo or something else)')
         formatted_record = f"[{timestamp}] {conversation_from_number}: \"{message_body}\""
         formatted_records.append(formatted_record)
     conversation_history = "\n".join(formatted_records)
