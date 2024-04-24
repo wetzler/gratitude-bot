@@ -3,10 +3,9 @@ import json
 import requests
 import urllib.parse
 
-# this stuff needs to be there for this to run on PythonAnywhere
+# load env variables 
 from dotenv import load_dotenv
-project_folder = os.path.expanduser('~/.')  # adjust as appropriate
-load_dotenv(os.path.join(project_folder, '.env'))
+load_dotenv(override=True)
 
 # Get Airtable parameters from environment variables
 base_key = os.environ.get('AIRTABLE_BASE_KEY')

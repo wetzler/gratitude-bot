@@ -5,16 +5,19 @@ from flask import Flask, request
 import storage
 import generative_ai
 import send_response
+from datetime import datetime
 
-# this stuff needs to be there for this to run on PythonAnywhere
+# load env variables 
 from dotenv import load_dotenv
-project_folder = os.path.expanduser('~/.')  # adjust as appropriate
-load_dotenv(os.path.join(project_folder, '.env'))
+load_dotenv(override=True)
 
 # Get Airtable parameters from environment variables
 base_key = os.environ.get('AIRTABLE_BASE_KEY')
 table_name = os.environ.get('AIRTABLE_TABLE_NAME')
 access_token = os.environ.get('AIRTABLE_PERSONAL_ACCESS_TOKEN')
+
+# Get Gratitidue Bot's Number
+twilio_number = os.environ.get('TWILIO_PHONE_NUMBER')
 
 app = Flask(__name__)
 
@@ -57,7 +60,24 @@ def sms():
     records = data.get('records', [])
     print("Found "+str(len(records))+" records in this conversation.")
 
-    # Sort the records by created time so the most recent is first
+    # Sort the records by created time so the most recent is first. Limitation: This only get the first 100 records.
+    records.sort(key=lambda x: x['fields']['created_time'], reverse=False)
+    formatted_records = []
+
+    for record in records:
+        timestamp = datetime.strptime(record['createdTime'], '%Y-%m-%dT%H:%M:%S.%fZ')
+        timestamp = timestamp.strftime('%Y-%m-%d %H:%M')
+        conversation_from_number = record['fields']['from_number']
+        if conversation_from_number == twilio_number:
+            conversation_from_number = "gratitude bot"
+        elif conversation_from_number == from_number:
+            conversation_from_number = "subscriber"
+        message_body = record['fields']['message_body']
+        formatted_record = f"[{timestamp}] {conversation_from_number}: \"{message_body}\""
+        formatted_records.append(formatted_record)
+    conversation_history = "\n".join(formatted_records)
+    print(conversation_history)
+
     records.sort(key=lambda x: x['fields']['created_time'], reverse=True)
     # Exclude the current incoming message from our list of previous messages
     records = [record for record in records if 'twilio_message_sid' in record['fields'] and record['fields']['twilio_message_sid'] != twilio_message_sid]
@@ -85,11 +105,15 @@ def sms():
         send_response.send_message(goodbye_message, user_number, "unsubscribe_message")
         storage.remove_user(user_number)
     # check if the previous message contains "gratitude bot". If so, assume this text is a response to prompts and ask a followup question
-    elif "gratitude bot" in previous_message or "daily reminder" in previous_message:
-        # ask AI to generate a followup question
-        followup_question = generative_ai.generate_response(message_body)
-        print("Our followup question: " + followup_question.content)
-        send_response.send_message(followup_question.content, user_number, "followup_question")
+    else:  #Ask AI to generate a followup reponse
+        followup_question = generative_ai.generate_response(conversation_history)
+        print("Our followup response: " + followup_question.content)
+        send_response.send_message(followup_question.content, user_number, "gb_response")
+    # elif "gratitude bot" in previous_message or "daily reminder" in previous_message:
+    #     # ask AI to generate a followup question
+    #     followup_question = generative_ai.generate_response(message_body)
+    #     print("Our followup question: " + followup_question.content)
+    #     send_response.send_message(followup_question.content, user_number, "followup_question")
     # else:
     #     #send a thank you message
     #     thank_you_message = "thanks for sharing. keep it up! 🌟"
