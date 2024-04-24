@@ -4,7 +4,7 @@ Gratitude Bot is a peaceful companion who helps you develop your gratitude pract
 Enhance your vibe by appreciating your life more :D
 
 # how to use 
-- Text "start" to (866)841-8810 to subscribe as an early beta user (aka tester)
+- Text "start" to (866)545-6543 to subscribe as an early beta user (aka tester)
 - Text STOP to opt out anytime
 - Receive a daily message asking what you are grateful for that day.
 - Respond to the prompt or text gratitude bot any time. All responses will be logged.
