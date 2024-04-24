@@ -1,3 +1,5 @@
+![gratitude bot watercolor face](/assets/images/gratitude-bot-wide.png)
+
 # gratitude-bot
 Research shows grateful people are happier.
 Gratitude Bot is a peaceful companion who helps you develop your gratitude practice via text. 
