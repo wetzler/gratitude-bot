@@ -104,11 +104,11 @@ def sms():
         goodbye_message = "i'll stop sending messages now! send START to subscribe again. have a great day! 🌟"
         send_response.send_message(goodbye_message, user_number, "unsubscribe_message")
         storage.remove_user(user_number)
-    # check if the previous message contains "gratitude bot". If so, assume this text is a response to prompts and ask a followup question
     else:  #Ask AI to generate a followup reponse
-        followup_question = generative_ai.generate_response(conversation_history)
+        followup_question = generative_ai.generate_responsev2(conversation_history)
         print("Our followup response: " + followup_question.content)
         send_response.send_message(followup_question.content, user_number, "gb_response")
+    # check if the previous message contains "gratitude bot". If so, assume this text is a response to prompts and ask a followup question    
     # elif "gratitude bot" in previous_message or "daily reminder" in previous_message:
     #     # ask AI to generate a followup question
     #     followup_question = generative_ai.generate_response(message_body)
