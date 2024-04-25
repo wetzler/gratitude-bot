@@ -21,103 +21,101 @@ twilio_number = os.environ.get('TWILIO_PHONE_NUMBER')
 
 app = Flask(__name__)
 
-@app.route('/')
-def home():
-    return "Hello, World!"
-
-@app.route('/sms', methods=['POST'])
+@app.route('/sms', methods=['POST'])  # Create a route for when a message come in from Twilio
 def sms():
-    print(table_name)
     # Get the text message details
     from_number = request.form['From']
     to_number = request.form['To']
     message_body = request.form['Body']
     twilio_message_sid  = request.form['MessageSid']
-    print("New message from "+ from_number + ": "+ message_body)
+    print("New incoming message from "+ from_number + ": "+ message_body)
 
     # Log the message
-    response = storage.store_message(from_number, to_number, message_body,"incoming user message",twilio_message_sid)
-    print(response)
-    # Get some information about this conversation so we can figure out what to do next
+    storage_response = storage.store_message(from_number, to_number, message_body,"incoming user message",twilio_message_sid)
+    print("Storing the message in Airtable.")
+    # print(storage_response)
+
+    # Get the full user conversation history
     # Define the filter formula to find messages to or from this number
     filter_formula = f"(OR(from_number='{from_number}', to_number='{from_number}'))"
-    # to-do: only get the messages from the last 24 hours instead of all of them
 
-    # URL-encode the filter formula
+    # URL-encode the filter formula so that we can make the request
     filter_formula = urllib.parse.quote(filter_formula)
 
     # Define the URL to make the request to the database
     url = f"https://api.airtable.com/v0/{base_key}/{table_name}?filterByFormula={filter_formula}"
+    headers = {"Authorization": f"Bearer {access_token}"} # Define the headers for the request
 
-    # Define the headers for the request
-    headers = {
-        "Authorization": f"Bearer {access_token}"
-    }
+    #recentmessages = requests.get(url, headers=headers)
+    
+    conversation_history = []
+    offset = None  # used to handle pagination of the results from the Airtable API
+    print("Getting conversation history from Airtable.")
 
-    # Make the GET request for the conversation data
-    recentmessages = requests.get(url, headers=headers)
-    data = recentmessages.json()
-    records = data.get('records', [])
-    print("Found "+str(len(records))+" records in this conversation.")
+    while True:
+        if offset:
+            paginated_url = url + f"&offset={offset}"
+            print("Getting more conversation history from Airtable. Offset: " + str(offset))
+        else:
+            paginated_url = url
 
-    # Sort the records by created time so the most recent is first. Limitation: This only get the first 100 records.
-    records.sort(key=lambda x: x['fields']['created_time'], reverse=False)
+        response = requests.get(paginated_url, headers=headers) # Make the GET request for the conversation data
+        response_json = response.json()
+
+        records = response_json.get('records', [])
+        conversation_history.extend(records)
+
+        offset = response_json.get('offset')
+        if not offset:
+            break    
+    
+    print("Found "+str(len(conversation_history))+" messages in this conversation.")
+    
+    # sort the messages by created time starting with the oldest
+    conversation_history.sort(key=lambda x: x['fields']['created_time'], reverse=False) 
+
+    # reformat the conversation to be easily readable in logs and by generative AI
+    print("Reformatting conversation history for readability.")
     formatted_records = []
-
-    for record in records:
-        timestamp = datetime.strptime(record['createdTime'], '%Y-%m-%dT%H:%M:%S.%fZ')
+    for message in conversation_history:
+        timestamp = datetime.strptime(message['createdTime'], '%Y-%m-%dT%H:%M:%S.%fZ')
         timestamp = timestamp.strftime('%Y-%m-%d %H:%M')
-        conversation_from_number = record['fields']['from_number']
+        conversation_from_number = message['fields']['from_number']
         if conversation_from_number == twilio_number:
             conversation_from_number = "gratitude bot"
         elif conversation_from_number == from_number:
             conversation_from_number = "subscriber"
-        message_body = record['fields'].get('message_body', 'no message (might have been a photo or something else)')
-        formatted_record = f"[{timestamp}] {conversation_from_number}: \"{message_body}\""
+        message_content = message['fields'].get('message_body', 'system note: no message (might have been a photo or something else)')
+        formatted_record = f"[{timestamp}] {conversation_from_number}: \"{message_content}\""
         formatted_records.append(formatted_record)
     conversation_history = "\n".join(formatted_records)
     print(conversation_history)
 
-    records.sort(key=lambda x: x['fields']['created_time'], reverse=True)
-    # Exclude the current incoming message from our list of previous messages
-    records = [record for record in records if 'twilio_message_sid' in record['fields'] and record['fields']['twilio_message_sid'] != twilio_message_sid]
-    # Get the most recent message prior to this one so we can figure out what to do next
-    previous_message = records[0]['fields']['message_body'] if records else None
-    if previous_message == None:
-        print("No previous message found.")
-    else:
-        print("The previous message was: " + previous_message)
-
+    print("Figuring out what to do based on the latest message")
     user_number = from_number
-    # check if it's a new subscriber
+    # check if the incoming message is from a new subscriber
     if message_body in ["START", "start", "Start", "Restart", "restart", "RESTART"]:
         # send a welcome message
         welcome_message = "hi! my name is gratitude bot! i send daily gratitude prompts. you can reply STOP at anytime. what are you grateful for today? 🌟"
+        print("Sending a welcome message to a new user: " + welcome_message) 
         send_response.send_message(welcome_message, user_number, "new_user_subscribed_welcome_message")
         storage.store_user(user_number, message_body)
-    elif not records:
+    elif not conversation_history:
         # send a welcome message
         welcome_message = "hi! my name is gratitude bot! i send daily gratitude prompts. reply START to subscribe. you can reply STOP at anytime. what are you grateful for today? 🌟"
+        print("Sending a welcome message to a new user: " + welcome_message) 
         send_response.send_message(welcome_message, user_number, "new_user_start_to_subscribe_welcome_message")
         storage.store_user(user_number, message_body)
     elif message_body in ["STOP", "stop", "Stop"]:
         goodbye_message = "i'll stop sending messages now! send START to subscribe again. have a great day! 🌟"
+        print("Sending a goodbye message to a user who has unsubscribed: " + goodbye_message)
         send_response.send_message(goodbye_message, user_number, "unsubscribe_message")
         storage.remove_user(user_number)
     else:  #Ask AI to generate a followup reponse
+        print("Crafting a followup response!")
         followup_question = generative_ai.generate_responsev2(conversation_history)
-        print("Our followup response: " + followup_question.content)
+        print("Sending our followup response: " + followup_question.content)
         send_response.send_message(followup_question.content, user_number, "gb_response")
-    # check if the previous message contains "gratitude bot". If so, assume this text is a response to prompts and ask a followup question    
-    # elif "gratitude bot" in previous_message or "daily reminder" in previous_message:
-    #     # ask AI to generate a followup question
-    #     followup_question = generative_ai.generate_response(message_body)
-    #     print("Our followup question: " + followup_question.content)
-    #     send_response.send_message(followup_question.content, user_number, "followup_question")
-    # else:
-    #     #send a thank you message
-    #     thank_you_message = "thanks for sharing. keep it up! 🌟"
-    #     send_response.send_message(thank_you_message, user_number, "thanks_for_submitting")
     return "Message received"
 
 if __name__ == '__main__':
