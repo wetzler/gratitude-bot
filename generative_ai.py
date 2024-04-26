@@ -32,8 +32,8 @@ def generate_responsev2(conversation_history):
        " If the user mentions an important person in their life, consider asking more about the role that person plays in their life, or the impact they have on the user."
        " Assume your users are well-educated, intelligent adults."},
       {"role": "user", "content": "Here is the conversation history between you and the user."
-       " You can see the date and time each message was sent. Please evalutate the most recent message and decide if you should respond. Use the following logic:"
-       " If the user is responding to a question about what they are grateful for today, ask them a followup quesiton, but only if you haven't already asked them a followup question today."
+       " Craft an appropriate response to the user's most recent message. You can see the date and time each message was sent. Please evaluate the recent messages and decide how you should respond. Use the following logic:"
+       " If the user is responding to a question about what they are grateful for today, ask them a followup question, but only if you haven't already asked them a followup question today."
        " If the user is responding to a followup question, close the conversation for the day."
        " Conversation:"+conversation_history}
     ]
