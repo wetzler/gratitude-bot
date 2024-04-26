@@ -61,7 +61,7 @@ def send_reminders_to_latest_users():
     user_numbers = get_latest_users()
     send_reminder(user_numbers)
 
-# Call send_reminder for each user_number
+# Call the function once immediately
 send_reminders_to_latest_users()
 
 # Schedule the reminder
