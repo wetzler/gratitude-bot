@@ -1,6 +1,6 @@
 # gratitude-bot
 research shows grateful people are happier 😌  
-gratitude bot is a peaceful companion who helps you develop your gratitude practice via text 🌱  
+gratitude bot helps you develop your gratitude practice via text 🌱  
 enhance your vibe by appreciating your life more ✨
 
 # how to use 
