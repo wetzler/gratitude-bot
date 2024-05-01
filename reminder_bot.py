@@ -6,7 +6,8 @@ import datetime
 import storage
 import requests
 import pytz
-from datetime import datetime, timedelta
+from datetime import datetime
+import generative_ai
 
 # load env variables 
 from dotenv import load_dotenv
@@ -48,7 +49,8 @@ client = Client(account_sid, auth_token)
 
 def send_reminder(user_numbers):
     for user_number in user_numbers:
-        text_reminder = "hi, it's gratitude bot. what are you feeling grateful for today? 🌟"
+        #text_reminder = "hi, it's gratitude bot. what are you feeling grateful for today? 🌟"
+        text_reminder = generative_ai.generate_daily_prompt()
         message = client.messages.create(
             body= text_reminder,
             from_=twilio_number,
