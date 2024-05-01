@@ -20,3 +20,4 @@ enhance your vibe by appreciating your life more ✨
 # nearterm roadmap
 - receive notes from gratitude bot regarding personalized themes, trends, and suggestions.
 - gratitude bot tracks how often you are journaling and gives fun kudos for streaks.
+- ignore automated messages from iOS saying the person is driving
