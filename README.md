@@ -1,7 +1,7 @@
 # gratitude-bot
-research shows grateful people are happier.
-gratitude Bot is a peaceful companion who helps you develop your gratitude practice via text. 
-enhance your vibe by appreciating your life more :D
+research shows grateful people are happier 😌  
+gratitude bot is a peaceful companion who helps you develop your gratitude practice via text 🌱
+enhance your vibe by appreciating your life more ✨
 
 # how to use 
 - text "start" to (866)545-6543 to subscribe as an early beta user (aka tester)
