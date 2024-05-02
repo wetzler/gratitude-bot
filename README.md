@@ -13,8 +13,8 @@ enhance your vibe by appreciating your life more ✨
 
 # notes & disclaimers
 - gratitude bot is currently in development and is likely to have outages, changes, bugs, data loss, and generally be unrealible until further notice.
-- gratitude bot can currently only capture responses written in text format. Photos and videos will be ignored.
-- privacy: while gratitude bot is in private beta, administrators of gratitude bot will read and review your submissions. Your submissions will never be shared with anyone else without your explicit permission.
+- gratitude bot can currently only capture responses written in text format. photos and videos will be ignored.
+- privacy: while gratitude bot is in private beta, michelle will read your conversations with the bot in order to tune the app. your submissions will never be shared with anyone else without your explicit permission.
 - please text any feedback or feature requests to Michelle, or log a github issue.
 
 # nearterm roadmap
