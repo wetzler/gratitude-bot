@@ -12,12 +12,13 @@ enhance your vibe by appreciating your life more ✨
 - you can ask questions about what you've written so far e.g. "can you remind me what i've been grateful for lately?"
 
 # notes & disclaimers
-- gratitude bot is currently in development and is likely to have outages, changes, bugs, data loss, and generally be unrealible until further notice.
-- gratitude bot can currently only capture responses written in text format. photos and videos will be ignored.
-- privacy: while gratitude bot is in private beta, michelle will read your conversations with the bot in order to tune the app. your submissions will never be shared with anyone else without your explicit permission.
-- please text any feedback or feature requests to Michelle, or log a github issue.
+- currently in early development and likely to have outages, changes, bugs, data loss, and generally be unrealible until further notice
+- can currently only capture responses written in text format. photos, voice, and videos will be ignored
+- privacy: while in beta, michelle will read your conversations with the bot in order to tune the app. your submissions will never be shared with anyone else without your explicit permission.
+- please share any feedback or feature requests with michelle, or log a github issue
 
 # nearterm roadmap
-- receive notes from gratitude bot regarding personalized themes, trends, and suggestions.
+- more tuning to avoid asking too many followup questions, which happens sometimes and can be annoying
+- receive notes from gratitude bot regarding personalized themes, trends, and suggestions
 - gratitude bot tracks how often you are journaling and gives fun kudos for streaks.
 - ignore automated messages from iOS saying the person is driving
