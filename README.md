@@ -18,7 +18,7 @@ enhance your vibe by appreciating your life more ✨
 - please share any feedback or feature requests with michelle, or log a github issue
 
 # nearterm roadmap
-- more tuning to avoid asking too many followup questions, which happens sometimes and can be annoying
+- more tuning to avoid asking too many followup questions, which happens sometimes
 - receive notes from gratitude bot regarding personalized themes, trends, and suggestions
 - gratitude bot tracks how often you are journaling and gives fun kudos for streaks.
 - ignore automated messages from iOS saying the person is driving
