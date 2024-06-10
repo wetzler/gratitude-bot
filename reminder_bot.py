@@ -82,8 +82,5 @@ try:
     # Call the function once immediately
     send_reminders_to_latest_users()
 
-    # Schedule the reminder
-    job = schedule.every(24).hours.do(send_reminders_to_latest_users)
-
 except Exception as e:
     logging.error('Failed to do something: ' + str(e))
