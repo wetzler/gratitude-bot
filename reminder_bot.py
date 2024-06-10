@@ -62,11 +62,11 @@ try:
     logging.info("Initializing Twilio client.")
     client = Client(account_sid, auth_token)
 
+    text_reminder = generative_ai.generate_daily_prompt()
+
     def send_reminder(user_numbers):
         logging.info("Sending reminders")
         for user_number in user_numbers:
-            #text_reminder = "hi, it's gratitude bot. what are you feeling grateful for today? 🌟"
-            text_reminder = generative_ai.generate_daily_prompt()
             message = client.messages.create(
                 body= text_reminder,
                 from_=twilio_number,
@@ -84,18 +84,6 @@ try:
 
     # Schedule the reminder
     job = schedule.every(24).hours.do(send_reminders_to_latest_users)
-
-    # Keep the script running and post logs so we can see that it's up and when the next run is
-    while True:
-        schedule.run_pending()
-        
-        current_time_pst = datetime.now(pytz.timezone('US/Pacific'))     # Get current time in PST
-        next_run_local = job.next_run
-        next_run_pst = next_run_local.astimezone(pytz.timezone('US/Pacific'))
-
-        print("Current time (PST):", current_time_pst.strftime('%m-%d %H:%M'), "0=0=0=0=0=0=0=0=0=0 Next run at (PST):", next_run_pst.strftime('%m-%d %H:%M'))
-
-        time.sleep(300)  # Check every 5 minutes
 
 except Exception as e:
     logging.error('Failed to do something: ' + str(e))
